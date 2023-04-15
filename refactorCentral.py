@@ -170,6 +170,8 @@ def _wheel(node_amount: int) -> Graph:
     
     return Graph(GraphType.WHEEL, adjacency_matrix, node_amount)
 
+def _cycle(node_amount: int) -> Graph:
+    """Return a cycle graph with desired amount of nodes."""
 ################
 # PERMUTATIONS #
 ################
