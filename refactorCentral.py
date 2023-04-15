@@ -273,3 +273,6 @@ def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> i
 #################
 # TIME ANALYSIS #
 #################
+
+def time_analysis(G: Graph) -> None:
+    """Prints out the pinnaclus brutus time for G, and the cumsum for utopius on all p-sets."""
