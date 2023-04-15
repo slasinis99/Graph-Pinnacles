@@ -347,3 +347,26 @@ def time_analysis(G: Graph) -> None:
 # FORMULA COMPUTATION #
 #######################
 
+class PinnacleFormulaNotDerived(Exception):
+    """Raised When attempting to calculate pinn for a graph where an equation has not been derived yet."""
+    
+    def __init__(self,GT: GraphType):
+        self.GT = GT
+        self.message = f"Formula has not been derived for {GT} yet."
+        super(self.message)
+
+def pinnacle_computation(GT: GraphType, pinnacle_set: list, time_log: bool = False) -> int:
+    """Use derived formulas to do the pinnacle computation."""
+    
+    if time_log: t = time.time()
+    
+    pinnacle_set.sort(reverse=True)
+    
+    if GT == GraphType.COMPLETE:
+        #INSERT VALIDATOR HERE
+        pinn = factorial(pinnacle_set[0])
+    else:
+        raise PinnacleFormulaNotDerived(GT)
+    
+    if time_log: print(f"pinnacle_computation({GT}, {pinnacle_set}) runtime = {time.time()-t}")
+    return pinn
