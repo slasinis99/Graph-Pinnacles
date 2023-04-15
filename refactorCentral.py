@@ -130,6 +130,8 @@ def create_graph(node_amount: int, style: str = 'star-1') -> Graph:
         return _star(node_amount=node_amount, star_amount=digits_only(style))
     elif style[0:9] == 'bipartite':
         return _bipartite(node_amount=node_amount, left_amount=digits_only(style))
+    elif style[0:5] == 'wheel':
+        return _wheel(node_amount=node_amount)
 
 def _star(node_amount: int, star_amount: int) -> Graph:
     """Create a Star Graph Instance"""
@@ -172,6 +174,7 @@ def _wheel(node_amount: int) -> Graph:
 
 def _cycle(node_amount: int) -> Graph:
     """Return a cycle graph with desired amount of nodes."""
+
 ################
 # PERMUTATIONS #
 ################
