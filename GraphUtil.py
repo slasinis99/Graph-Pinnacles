@@ -365,11 +365,15 @@ def _validate_pinnacle_set(GT: GraphType, pinnacle_set: list, node_count: int, s
         if not all([i > star_count for i in p]): raise InvalidPinnacleSet(p, f'{p} is an invalid pinnacle set for a star graph with {node_count} vertices and {star_count} stars.')
         if not node_count in p: raise InvalidPinnacleSet(p, f'{p} is an invalid pinnacle set for a star graph with {node_count} vertices and {star_count} stars.')
         for i in range(len(p)-1):
-            if p[i]-p[i+1] != 0: raise InvalidPinnacleSet(p, f'{p} is an invalid pinnacle set for a star graph with {node_count} vertices and {star_count} stars.')
+            if p[i]-p[i+1] != 1: raise InvalidPinnacleSet(p, f'{p} is an invalid pinnacle set for a star graph with {node_count} vertices and {star_count} stars.')
         return
     elif GT == GraphType.BIPARTITE:
         if not node_count in p: raise InvalidPinnacleSet(p, f"{p} is an invalid pinnacle set for a complete bipartite with {node_count} nodes and m={bipartite_left}, n={node_count-bipartite_left}.")
-        
+        min_val = min(bipartite_left, node_count-bipartite_left)
+        if not all([i > min_val for i in p]): raise InvalidPinnacleSet(p, f"{p} is an invalid pinnacle set for a complete bipartite with {node_count} nodes and m={bipartite_left}, n={node_count-bipartite_left}.")
+        for i in range(len(p)-1):
+            if p[i]-p[i+1] != 1: raise InvalidPinnacleSet(p, f"{p} is an invalid pinnacle set for a complete bipartite with {node_count} nodes and m={bipartite_left}, n={node_count-bipartite_left}.")
+        return
 
 def pinnacle_computation(GT: GraphType, pinnacle_set: list, node_count: int, star_count: int = 0, bipartite_left: int = 0, time_log: bool = False) -> int:
     """Use derived formulas to do the pinnacle computation."""
