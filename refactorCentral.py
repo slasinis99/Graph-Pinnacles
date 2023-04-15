@@ -189,6 +189,14 @@ def _cycle(node_amount: int) -> Graph:
 def _complete(node_amount: int) -> Graph:
     """Returns a complete graph with desired node amount."""
     
+    adjacency_matrix = []
+    
+    for i in node_amount:
+        n = [1]*node_amount
+        n[i] = 0
+        adjacency_matrix.append(n)
+    
+    return Graph(GraphType.COMPLETE, adjacency_matrix, node_amount)
 
 ################
 # PERMUTATIONS #
