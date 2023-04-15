@@ -342,3 +342,7 @@ def time_analysis(G: Graph) -> None:
 # def main():
 #     time_analysis(create_graph(11,'bipartite6'))
 # main()
+
+#######################
+# FORMULA COMPUTATION #
+#######################
