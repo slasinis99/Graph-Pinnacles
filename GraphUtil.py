@@ -355,7 +355,7 @@ class PinnacleFormulaNotDerived(Exception):
         self.message = f"Formula has not been derived for {GT} yet."
         super().__init__(self.message)
 
-def pinnacle_computation(GT: GraphType, pinnacle_set: list, star_count: int = 0, time_log: bool = False) -> int:
+def pinnacle_computation(GT: GraphType, pinnacle_set: list, star_count: int = 0, bipartite_left: int = 0, time_log: bool = False) -> int:
     """Use derived formulas to do the pinnacle computation."""
     
     if time_log: t = time.time()
@@ -372,6 +372,16 @@ def pinnacle_computation(GT: GraphType, pinnacle_set: list, star_count: int = 0,
         else:
             i = pinnacle_set[0]-pinnacle_set[-1]
             pinn = star_count * (factorial(pinnacle_set[0]-star_count)/factorial(pinnacle_set[0]-star_count-i-1)) * factorial(pinnacle_set[0]-i-2)
+    elif GT == GraphType.BIPARTITE:
+        #INSERT VALIDATION HERE
+        m = bipartite_left
+        n = pinnacle_set[0] - m
+        if n > m: m, n = n, m
+        i = pinnacle_set[0]-pinnacle_set[-1]
+        if i < n:
+            pinn = factorial(m+n-i-2)*(m*factorial(n)/factorial(n-i-1) + n*factorial(m)/factorial(m-i-1))
+        else:
+            pinn = factorial(m+n-i-2)*n*factorial(m)/factorial(m-i-1)
     else:
         raise PinnacleFormulaNotDerived(GT)
     
