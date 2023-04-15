@@ -192,8 +192,8 @@ def pinnaclus_brutus(G: Graph, time_log: bool = False) -> dict:
     for p in generate_permutations(G.size):
         pinn_set = G.get_pinnacles(p)
         if str(pinn_set) in pinnacle_occurences:
-            pinnacle_occurences[str(pinn_set)] += 1
-        else: pinnacle_occurences[str(pinn_set)] = 1
+            pinnacle_occurences[str(pinn_set)][0] += 1
+        else: pinnacle_occurences[str(pinn_set)] = [1, pinn_set]
     if time_log: print(f"pinnaclus_brutus runtime = {time.time()-t}secs")
     return pinnacle_occurences
 
@@ -276,3 +276,24 @@ def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> i
 
 def time_analysis(G: Graph) -> None:
     """Prints out the pinnaclus brutus time for G, and the cumsum for utopius on all p-sets."""
+    
+    brute = pinnaclus_brutus(G, time_log=True)
+    print(brute)
+    
+    psets = [p[1] for p in brute.values()]
+    
+    total_time = 0
+    for p in psets:
+        print(p)
+        t = time.time()
+        print(pinnaclus_utopius(G,p,time_log=True)[0])
+        total_time += time.time() - t
+    print(f"pinnaclus utopius cumulative runtime = {total_time}secs")
+
+########
+# MAIN #
+########
+
+def main():
+    time_analysis(create_graph(11,'bipartite6'))
+main()
