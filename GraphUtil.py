@@ -348,11 +348,17 @@ class PinnacleFormulaNotDerived(Exception):
         self.message = f"Formula has not been derived for {GT} yet."
         super().__init__(self.message)
 
-def _validate_pinnacle_set(GT: GraphType, pinnacle_set: list, star_count: int = 0, bipartite_left: int = 0) -> bool:
+def _validate_pinnacle_set(GT: GraphType, pinnacle_set: list, star_count: int = 0, bipartite_left: int = 0) -> None:
     """Returns true if this is a valid pinnacle set for provide graph type."""
     
+    p = sorted(pinnacle_set, reverse=True)
+    
     if GT == GraphType.STAR:
-        valid = True
+        if 1 in p: return False
+        if not len(p) in p: return False
+        for i in range(len(p)-1):
+            if p[i]-p[i+1] != 0: return False
+        return True
 
 def pinnacle_computation(GT: GraphType, pinnacle_set: list, star_count: int = 0, bipartite_left: int = 0, time_log: bool = False) -> int:
     """Use derived formulas to do the pinnacle computation."""
