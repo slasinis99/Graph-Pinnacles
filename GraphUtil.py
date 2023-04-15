@@ -346,3 +346,4 @@ def time_analysis(G: Graph) -> None:
 #######################
 # FORMULA COMPUTATION #
 #######################
+
