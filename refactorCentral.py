@@ -157,6 +157,18 @@ def _bipartite(node_amount: int, left_amount: int):
 
 def _wheel(node_amount: int) -> Graph:
     """Returns a wheel graph with desired node amount."""
+    
+    adjacency_matrix = []
+    
+    for i in range(node_amount-1):
+        node = [0]*node_amount
+        node[(i-1)%(node_amount-1)] = 1
+        node[(i+1)%(node_amount-1)] = 1
+        node[-1] = 1
+        adjacency_matrix.append(node)
+    adjacency_matrix.append([1]*(node_amount-1) + [0])
+    
+    return Graph(GraphType.WHEEL, adjacency_matrix, node_amount)
 
 ################
 # PERMUTATIONS #
