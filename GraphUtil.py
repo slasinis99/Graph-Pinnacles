@@ -348,17 +348,25 @@ class PinnacleFormulaNotDerived(Exception):
         self.message = f"Formula has not been derived for {GT} yet."
         super().__init__(self.message)
 
+class InvalidPinnacleSet(Exception):
+    """Raised when trying passing an inadmissible pinnacle set."""
+    
+    def __init__(self, pinnacle_set: list, message: str):
+        self.pinnacle_set = pinnacle_set
+        self.message = message
+        super().__init__(message)
+
 def _validate_pinnacle_set(GT: GraphType, pinnacle_set: list, star_count: int = 0, bipartite_left: int = 0) -> None:
     """Returns true if this is a valid pinnacle set for provide graph type."""
     
     p = sorted(pinnacle_set, reverse=True)
     
     if GT == GraphType.STAR:
-        if 1 in p: return False
-        if not len(p) in p: return False
+        if 1 in p: raise InvalidPinnacleSet(p, f'{p} is an invalid pinnacle set for a star graph with {star_count} stars.')
+        if not len(p) in p: raise InvalidPinnacleSet(p, f'{p} is an invalid pinnacle set for a star graph with {star_count} stars.')
         for i in range(len(p)-1):
-            if p[i]-p[i+1] != 0: return False
-        return True
+            if p[i]-p[i+1] != 0: raise InvalidPinnacleSet(p, f'{p} is an invalid pinnacle set for a star graph with {star_count} stars.')
+        return
 
 def pinnacle_computation(GT: GraphType, pinnacle_set: list, star_count: int = 0, bipartite_left: int = 0, time_log: bool = False) -> int:
     """Use derived formulas to do the pinnacle computation."""
