@@ -270,3 +270,6 @@ def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> i
     
     return factorial(G.get_smallest_degree())*total, labelings
     
+#################
+# TIME ANALYSIS #
+#################
