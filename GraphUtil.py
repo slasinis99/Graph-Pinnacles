@@ -339,6 +339,6 @@ def time_analysis(G: Graph) -> None:
 # MAIN #
 ########
 
-def main():
-    time_analysis(create_graph(11,'bipartite6'))
-main()
+# def main():
+#     time_analysis(create_graph(11,'bipartite6'))
+# main()
