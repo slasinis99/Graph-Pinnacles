@@ -53,7 +53,7 @@ class Node():
 @dataclass
 class Graph:
     id: GraphType
-    adjacency_matrix: list
+    adjacency_matrix: list = field(repr=False)
     size: int
     node_list: list[Node] = field(default_factory=list,repr=False)
     
@@ -217,6 +217,56 @@ def get_non_touching_pairs(G: Graph, pair_size: int, time_log: bool = False) -> 
                     pair_dict[str([n1,n2])] = set(n1[0]) | set(n2[0])
         pairings.append(pairs)
     G.set_node_values(original_values)
-    print(f"get_non_touching_pairs runtime = {time.time()-t}secs")  
+    if time_log: print(f"get_non_touching_pairs runtime = {time.time()-t}secs")  
     return pairings[-1]
 
+def fill_in_pair(G: Graph, pair: list, pinnacle_set_ordered: list, time_log: bool = False) -> list:
+    """For a given pinnacle set with a labeling, return all of the distinct way to label the graph."""
+    
+    if time_log: t = time.time()
+    
+    G.set_node_values([0]*G.size)
+    
+    NP = [i for i in range(G.size,0,-1) if not i in pinnacle_set_ordered and i > G.get_smallest_degree()]
+    
+    for i,p in enumerate(pair[0]): p.set_value(pinnacle_set_ordered[i])
+    
+    graph_list = [G]
+    
+    for val in NP:
+        new_graph_list = []
+        for g in graph_list:
+            for node in g.node_list:
+                if node.value == 0 and all([val < other_node.value for other_node in node.connection_list if other_node.value in pinnacle_set_ordered]) and any([val < other_node.value for other_node in node.connection_list]):
+                    node.set_value(val)
+                    new_graph_list.append(g.copy())
+                    node.set_value(0)
+        graph_list = new_graph_list
+    
+    if time_log: print(f"fill_in_pair runtime = {time.time()-t}secs")
+    
+    return len(graph_list), graph_list
+ 
+def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> int | list:
+    """Return the value of Pinn(pinnacle_set, G) along with the list of all labelings minus final factorial."""
+     
+    if time_log: t = time.time()
+     
+    pairs = get_non_touching_pairs(G, len(pinnacle_set))
+     
+    permutations = []
+    P = sorted(pinnacle_set, reverse=True)
+    _generate_permutations(permutations, P, len(P))
+     
+    total = 0
+    labelings = []
+    for p in pairs:
+        for i in permutations:
+            pack = fill_in_pair(G,p,i)
+            total += pack[0]
+            labelings += pack[1]
+            
+    if time_log: print(f"pinnaclus_utopius runtime = {time.time()-t}secs")
+    
+    return factorial(G.get_smallest_degree())*total, labelings
+    
