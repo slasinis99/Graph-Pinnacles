@@ -193,7 +193,7 @@ def _complete(node_amount: int) -> Graph:
     
     adjacency_matrix = []
     
-    for i in node_amount:
+    for i in range(node_amount):
         n = [1]*node_amount
         n[i] = 0
         adjacency_matrix.append(n)
