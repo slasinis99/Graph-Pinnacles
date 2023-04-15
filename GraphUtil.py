@@ -336,7 +336,7 @@ def time_analysis(G: Graph) -> None:
     print(f"pinnaclus utopius cumulative runtime = {total_time}secs")
 
 ########
-# MAIN #
+# MAIN (TESTING) #
 ########
 
 # def main():
