@@ -348,6 +348,12 @@ class PinnacleFormulaNotDerived(Exception):
         self.message = f"Formula has not been derived for {GT} yet."
         super().__init__(self.message)
 
+def _validate_pinnacle_set(GT: GraphType, pinnacle_set: list, star_count: int = 0, bipartite_left: int = 0) -> bool:
+    """Returns true if this is a valid pinnacle set for provide graph type."""
+    
+    if GT == GraphType.STAR:
+        valid = True
+
 def pinnacle_computation(GT: GraphType, pinnacle_set: list, star_count: int = 0, bipartite_left: int = 0, time_log: bool = False) -> int:
     """Use derived formulas to do the pinnacle computation."""
     
@@ -356,17 +362,14 @@ def pinnacle_computation(GT: GraphType, pinnacle_set: list, star_count: int = 0,
     pinnacle_set.sort(reverse=True)
     
     if GT == GraphType.COMPLETE:
-        #INSERT VALIDATOR HERE
         pinn = factorial(pinnacle_set[0])
     elif GT == GraphType.STAR:
-        #INSERT VALIDATOR HERE
         if len(pinnacle_set) == 1:
             pinn = star_count*(factorial(pinnacle_set[0]-1) + (pinnacle_set[0]-star_count)*factorial(pinnacle_set[0]-2))
         else:
             i = pinnacle_set[0]-pinnacle_set[-1]
             pinn = star_count * (factorial(pinnacle_set[0]-star_count)/factorial(pinnacle_set[0]-star_count-i-1)) * factorial(pinnacle_set[0]-i-2)
     elif GT == GraphType.BIPARTITE:
-        #INSERT VALIDATION HERE
         m = bipartite_left
         n = pinnacle_set[0] - m
         if n > m: m, n = n, m
