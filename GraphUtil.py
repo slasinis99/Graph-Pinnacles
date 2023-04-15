@@ -335,13 +335,6 @@ def time_analysis(G: Graph) -> None:
         total_time += time.time() - t
     print(f"pinnaclus utopius cumulative runtime = {total_time}secs")
 
-########
-# MAIN (TESTING) #
-########
-
-# def main():
-#     time_analysis(create_graph(11,'bipartite6'))
-# main()
 
 #######################
 # FORMULA COMPUTATION #
