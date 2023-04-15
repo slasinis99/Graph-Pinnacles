@@ -134,6 +134,8 @@ def create_graph(node_amount: int, style: str = 'star-1') -> Graph:
         return _wheel(node_amount=node_amount)
     elif style[0:5] == 'cycle':
         return _cycle(node_amount=node_amount)
+    elif style[0:8] == 'complete':
+        return _complete(node_amount=node_amount)
 
 def _star(node_amount: int, star_amount: int) -> Graph:
     """Create a Star Graph Instance"""
