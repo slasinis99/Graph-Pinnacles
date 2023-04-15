@@ -4,4 +4,4 @@
 #Import our Graph Utility functions
 import GraphUtil as gu
 
-gu.time_analysis(gu.create_graph(10,'complete')) 
+print(gu.pinnacle_computation(gu.GraphType.BIPARTITE,[9]))
