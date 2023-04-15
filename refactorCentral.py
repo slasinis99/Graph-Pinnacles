@@ -1,0 +1,222 @@
+#File to perform code refactoring before pushing the GraphUtil.py
+from __future__ import annotations
+from math import factorial
+from dataclasses import dataclass, field
+from enum import Enum, auto
+import time
+
+#################
+# CUSTOM ERRORS #
+#################
+
+class ListSizeMismatch(Exception):
+    """Raised when two arrays should have the same size, but do not.
+    
+    Attributes:
+        list_one -- list in question
+        list_two -- other list in question
+        message -- explanation of the error
+    """
+    
+    def __init__(self, list_one: list, list_two: list, message: str):
+        self.list_one = list_one
+        self.list_two = list_two
+        self.message = message
+        super().__init__(message)
+
+#########
+# ENUMS #
+#########
+
+class GraphType(Enum):
+    STAR = auto()
+    COMPLETE = auto()
+    CYCLE = auto()
+    WHEEL = auto()
+    BIPARTITE = auto()
+
+#################
+# GRAPH CLASSES #
+#################
+
+@dataclass(eq=False)
+class Node():
+    value: int = field(default=0, repr=True)
+    connection_list: list = field(default_factory=list, repr=False)
+    
+    def add_connection(self, node: Node) -> None:
+        self.connection_list.append(node)
+    
+    def set_value(self, value: int) -> None:
+        self.value = value
+
+@dataclass
+class Graph:
+    id: GraphType
+    adjacency_matrix: list
+    size: int
+    node_list: list[Node] = field(default_factory=list,repr=False)
+    
+    def __post_init__(self):
+        for _ in range(self.size): self.node_list.append(Node(0))
+        for r in range(len(self.adjacency_matrix)):
+            for c in range(len(self.adjacency_matrix[r])):
+                if self.adjacency_matrix[r][c]: self.node_list[r].add_connection(self.node_list[c])
+    
+    def set_node_values(self, values: list) -> None:
+        """Assigns the values passed to the nodes in the graph"""
+        
+        if len(self.node_list) != len(values):
+            raise ListSizeMismatch(
+                list_one=self.node_list,
+                list_two=values,
+                message="(set_node_values) : The length of Node List does not match the length of the list of values \
+                    you are attempting to assign the Node Values with."
+            )
+            
+        for i in range(self.size):
+            self.node_list[i].set_value(values[i])
+    
+    def get_node_values(self) -> list:
+        """Returns a list of the values in the graph"""
+        
+        return [node.value for node in self.node_list]
+    
+    def get_smallest_degree(self) -> int:
+        """Returns the smallest degree a Node has in this Graph"""
+        
+        return min([len(node.connection_list) for node in self.node_list])
+    
+    def get_pinnacles(self, values: list = []) -> list:
+        """Returns the sorted list of pinnacle values for this graph.
+        
+        Attributes:
+            values: list = [] -- optional argument to set the node values before getting the pinnacles
+        
+        Returns:
+            list -- List containing the values that are pinnacles
+        """
+        if len(values) != 0:
+            self.set_node_values(values=values)
+        
+        return sorted([node.value for node in self.node_list if all([node.value > other_node.value for other_node in node.connection_list])], reverse=True)
+
+    def copy(self) -> Graph:
+        """Create and return a deep copy."""
+        new_graph = Graph(self.id,self.adjacency_matrix,self.size)
+        new_graph.set_node_values(self.get_node_values())
+        return new_graph
+
+##################
+# GRAPH CREATION #     
+##################
+
+def digits_only(s: str) -> int:
+    """Takes a string and returns an integer for the digits in string."""
+    i = ''
+    for d in [char for char in s if char.isdigit()]:
+        i += d
+    return int(i)
+
+def create_graph(node_amount: int, style: str = 'star-1') -> Graph:
+    """Create a Graph with the desired amount of nodes for given style
+    
+    Attributes:
+        node_amount: int -- total number of nodes / vertices in the Graph
+        style: str -- string that determines that specific of the graph type
+    """
+    
+    if style[0:4] == 'star':
+        return _star(node_amount=node_amount, star_amount=digits_only(style))
+    elif style[0:9] == 'bipartite':
+        return _bipartite(node_amount=node_amount, left_amount=digits_only(style))
+
+def _star(node_amount: int, star_amount: int) -> Graph:
+    """Create a Star Graph Instance"""
+    
+    adjacency_matrix = []
+    for i in range(node_amount):
+        if i < star_amount:
+            node = [1]*node_amount
+            node[i] = 0
+        else: node = [1]*star_amount + [0]*(node_amount-star_amount)
+        adjacency_matrix.append(node)
+    return Graph(GraphType.STAR, adjacency_matrix, node_amount) 
+
+def _bipartite(node_amount: int, left_amount: int):
+    """Create a Complete Bipartite"""
+
+    adjacency_matrix = []
+    for i in range(left_amount):
+        adjacency_matrix.append([0]*left_amount + [1]*(node_amount-left_amount))
+        
+    for i in range(node_amount-left_amount):
+        adjacency_matrix.append([1]*left_amount + [0]*(node_amount-left_amount))
+        
+    return Graph(GraphType.BIPARTITE, adjacency_matrix, node_amount)
+
+################
+# PERMUTATIONS #
+################
+
+def generate_permutations(size: int) -> list:
+    """Return a list of all permutations of the given size using values [1,...,size]"""
+    
+    S = []
+    _generate_permutations(S, [i+1 for i in range(size)], size)
+    return S
+
+def _generate_permutations(S: list, a: list, size: int):
+    """Generate the permutations of a onto S recursively"""
+    
+    if (size == 1):
+        S.append(a.copy())
+        return
+    
+    for i in range(size):
+        _generate_permutations(S, a, size-1)
+        
+        if (size & 1):
+            a[0], a[size-1] = a[size-1], a[0]
+        else: a[i], a[size-1] = a[size-1], a[i]    
+
+#############################
+# COMPREHENSIVE BRUTE FORCE #
+#############################
+
+def pinnaclus_brutus(G: Graph, time_log: bool = False) -> dict:
+    """Generate every pinnacle set and record the number of occurences."""
+    
+    if time_log: t = time.time()
+    pinnacle_occurences = {}
+    for p in generate_permutations(G.size):
+        pinn_set = G.get_pinnacles(p)
+        if str(pinn_set) in pinnacle_occurences:
+            pinnacle_occurences[str(pinn_set)] += 1
+        else: pinnacle_occurences[str(pinn_set)] = 1
+    if time_log: print(f"pinnaclus_brutus runtime = {time.time()-t}secs")
+    return pinnacle_occurences
+
+#####################
+# UTOPIUS ALGORITHM #
+#####################
+
+def get_non_touching_pairs(G: Graph, pair_size: int, time_log: bool = False) -> list:
+    """Return all the distinct ways to label G with pair_size number of values such that none of them are touching."""
+    if time_log: t = time.time()
+    original_values = G.get_node_values()
+    G.set_node_values([i+1 for i in range(G.size)])
+    pairings = [[[[node], set(node.connection_list)] for node in G.node_list]]
+    while len(pairings) < pair_size:
+        pair_dict = {}
+        pairs = []
+        for n1 in pairings[-1]:
+            for n2 in pairings[0]:
+                if set(n1[0]) != set(n2[0]) and (not n2[0][0] in set(n1[1])) and (not n2[0][0] in set(n1[0])) and not (set(n1[0]) | set(n2[0]) in pair_dict.values()):
+                    pairs.append([set(n1[0]) | set(n2[0]), n1[1] | n2[1]])
+                    pair_dict[str([n1,n2])] = set(n1[0]) | set(n2[0])
+        pairings.append(pairs)
+    G.set_node_values(original_values)
+    print(f"get_non_touching_pairs runtime = {time.time()-t}secs")  
+    return pairings[-1]
+
