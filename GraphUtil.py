@@ -265,14 +265,17 @@ def get_non_touching_pairs(G: Graph, pair_size: int, time_log: bool = False) -> 
     if time_log: print(f"get_non_touching_pairs runtime = {time.time()-t}secs")  
     return pairings[-1]
 
-def fill_in_pair(G: Graph, pair: list, pinnacle_set_ordered: list, time_log: bool = False) -> list:
+def fill_in_pair(G: Graph, pair: list, pinnacle_set_ordered: list, time_log: bool = False, complete: bool = False) -> list:
     """For a given pinnacle set with a labeling, return all of the distinct way to label the graph."""
     
     if time_log: t = time.time()
     
     G.set_node_values([0]*G.size)
     
-    NP = [i for i in range(G.size,0,-1) if not i in pinnacle_set_ordered and i > G.get_smallest_degree()]
+    if complete: small = 0
+    else: small = G.get_smallest_degree()
+    
+    NP = [i for i in range(G.size,0,-1) if not i in pinnacle_set_ordered and i > small]
     
     for i,p in enumerate(pair[0]): p.set_value(pinnacle_set_ordered[i])
     
@@ -292,7 +295,7 @@ def fill_in_pair(G: Graph, pair: list, pinnacle_set_ordered: list, time_log: boo
     
     return len(graph_list), graph_list
  
-def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> int | list:
+def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False, complete: bool = False) -> int | list:
     """Return the value of Pinn(pinnacle_set, G) along with the list of all labelings minus final factorial."""
      
     if time_log: t = time.time()
@@ -307,7 +310,7 @@ def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> i
     labelings = []
     for p in pairs:
         for i in permutations:
-            pack = fill_in_pair(G,p,i)
+            pack = fill_in_pair(G,p,i, complete)
             total += pack[0]
             labelings += pack[1]
             
