@@ -3,5 +3,8 @@
 """
 #Import our Graph Utility functions
 import GraphUtil as gu
+import GraphDraw as gd
 
-print(gu.pinnacle_computation(gu.GraphType.BIPARTITE,[20,19,17], node_count=20, bipartite_left=10,time_log=True))
+g_list = gu.pinnaclus_utopius(gu.create_graph(5,'star1'),[5,4],True,True)[1]
+
+gd.draw_graphs(g_list)

@@ -16,4 +16,5 @@ def draw_graphs(graph_list: list):
             for c in range(r+1,len(g.adjacency_matrix[r])):
                 if g.adjacency_matrix[r][c] != 0: sG.edge(f'{j},{r}',f'{j},{c}')
         G.subgraph(sG)
+    G.layout = 'osage'
     G.render(view=True)
