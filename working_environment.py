@@ -5,6 +5,6 @@
 import GraphUtil as gu
 import GraphDraw as gd
 
-g_list = gu.pinnaclus_utopius(gu.create_graph(5,'star1'),[5,4],True,True)[1]
-
+total,g_list = gu.pinnaclus_utopius(gu.create_graph(6,'wheel'),[6,4],True,complete=True)
+print(total)
 gd.draw_graphs(g_list)
