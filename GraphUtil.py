@@ -275,7 +275,7 @@ def fill_in_pair(G: Graph, pair: list, pinnacle_set_ordered: list, time_log: boo
     if complete == True:
         NP = [i for i in range(G.size,0,-1) if not i in pinnacle_set_ordered]
     else: NP = [i for i in range(G.size,0,-1) if not i in pinnacle_set_ordered and i > G.get_smallest_degree()]
-    print(NP)
+    
     for i,p in enumerate(pair[0]): p.set_value(pinnacle_set_ordered[i])
     
     graph_list = [G]
