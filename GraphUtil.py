@@ -34,6 +34,7 @@ class GraphType(Enum):
     CYCLE = auto()
     WHEEL = auto()
     BIPARTITE = auto()
+    CUSTOM = auto()
 
 #################
 # GRAPH CLASSES #
@@ -136,6 +137,9 @@ def create_graph(node_amount: int, style: str = 'star-1') -> Graph:
         return _cycle(node_amount=node_amount)
     elif style[0:8] == 'complete':
         return _complete(node_amount=node_amount)
+
+def create_graph_custom(adjacency_matrix: list):
+    return Graph(GraphType.CUSTOM,adjacency_matrix,len(adjacency_matrix))
 
 def _star(node_amount: int, star_amount: int) -> Graph:
     """Create a Star Graph Instance"""
