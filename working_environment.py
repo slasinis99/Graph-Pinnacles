@@ -5,5 +5,5 @@
 import GraphUtil as gu
 import GraphDraw as gd
 
-G = gu.pinnaclus_brutus(gu.create_graph(10,'wheel'))
-print(G)
+G = gu.create_graph(7,'cycle')
+gu.analyis_interval(G)

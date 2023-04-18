@@ -411,3 +411,18 @@ def pinnacle_computation(GT: GraphType, pinnacle_set: list, node_count: int, sta
     
     if time_log: print(f"pinnacle_computation({GT}, {pinnacle_set}) runtime = {time.time()-t}")
     return pinn
+
+###############################
+# PINNACLE SET ANALYSIS STUFF #
+###############################
+
+def analyis_interval(G: Graph) -> None:
+    D = pinnaclus_brutus(G)
+    
+    #Find the total number of labelings that are intervals
+    total = sum([s[0] for s in D.values() if all([s[1][i]-s[1][i+1] == 1 for i in range(0,len(s[1])-1)])])
+    print(f"Number of labelings for interval pinnacle sets = {total}")
+    
+    #find the total number of labelings that are not intervals
+    total = sum([s[0] for s in D.values() if any([s[1][i]-s[1][i+1] != 1 for i in range(0,len(s[1])-1)])])
+    print(f"Number of labelings for non-interval pinnacle sets = {total}")
