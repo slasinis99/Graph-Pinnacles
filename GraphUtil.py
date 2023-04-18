@@ -315,7 +315,10 @@ def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False, comp
             
     if time_log: print(f"pinnaclus_utopius runtime = {time.time()-t}secs")
     
-    return factorial(G.get_smallest_degree())*total, labelings
+    if not complete:
+        total = int(factorial(G.get_smallest_degree())*total / 2)
+        
+    return total, labelings
     
 #################
 # TIME ANALYSIS #
