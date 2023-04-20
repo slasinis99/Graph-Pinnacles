@@ -383,6 +383,14 @@ def _validate_pinnacle_set(GT: GraphType, pinnacle_set: list, node_count: int, s
         for i in range(len(p)-1):
             if p[i]-p[i+1] != 1: raise InvalidPinnacleSet(p, f"{p} is an invalid pinnacle set for a complete bipartite with {node_count} nodes and m={bipartite_left}, n={node_count-bipartite_left}.")
         return
+    elif GT == GraphType.CYCLE:
+        if len(p) != 1: raise InvalidPinnacleSet(pinnacle_set, f'{p} is not a pinnacle set I have a formula for, for a cycle graph.')
+        if p[0] != node_count: raise InvalidPinnacleSet(pinnacle_set,f'{p} must contain the largest possible value (i.e., node_count).')
+        return
+    elif GT == GraphType.WHEEL:
+        if len(p) != 1: raise InvalidPinnacleSet(pinnacle_set, f'{p} is not a pinnacle set I have a formula for, for a wheel graph.')
+        if p[0] != node_count: raise InvalidPinnacleSet(pinnacle_set, f'{p} must contain the node_count as a value.')
+        return
 
 def pinnacle_computation(GT: GraphType, pinnacle_set: list, node_count: int, star_count: int = 0, bipartite_left: int = 0, time_log: bool = False) -> int:
     """Use derived formulas to do the pinnacle computation."""
@@ -410,6 +418,11 @@ def pinnacle_computation(GT: GraphType, pinnacle_set: list, node_count: int, sta
             pinn = factorial(m+n-i-2)*(m*factorial(n)/factorial(n-i-1) + n*factorial(m)/factorial(m-i-1))
         else:
             pinn = factorial(m+n-i-2)*n*factorial(m)/factorial(m-i-1)
+    elif GT == GraphType.CYCLE:
+        return node_count*2**(node_count-2)
+    elif GT == GraphType.WHEEL:
+        n = node_count
+        return factorial(n-1) + (n-1) * (2**(n-2) + sum([2**(i-2)*factorial(n-i) for i in range(2,n-1)]))
     else:
         raise PinnacleFormulaNotDerived(GT)
     

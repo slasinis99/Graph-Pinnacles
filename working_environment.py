@@ -21,3 +21,4 @@ G = gu.create_graph_custom(A)
 #print(gu.pinnaclus_brutus(G))
 
 print(gu.pinnaclus_brutus(gu.create_graph(8,'wheel')))
+print(gu.pinnacle_computation(gu.GraphType.WHEEL,[8],8))
