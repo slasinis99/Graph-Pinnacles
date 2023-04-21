@@ -313,14 +313,14 @@ def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False, comp
     labelings = []
     for p in pairs:
         for i in permutations:
-            pack = fill_in_pair(G,p,i,complete=True)
+            pack = fill_in_pair(G,p,i,complete=complete)
             total += pack[0]
             labelings += pack[1]
             
     if time_log: print(f"pinnaclus_utopius runtime = {time.time()-t}secs")
     
     if not complete:
-        total = int(factorial(G.get_smallest_degree())*total / 2)
+        total = int(factorial(G.get_smallest_degree())*total)
         
     return total, labelings
     
@@ -443,3 +443,10 @@ def analyis_interval(G: Graph) -> None:
     #find the total number of labelings that are not intervals
     total = sum([s[0] for s in D.values() if any([s[1][i]-s[1][i+1] != 1 for i in range(0,len(s[1])-1)])])
     print(f"Number of labelings for non-interval pinnacle sets = {total}")
+    
+###############################
+# UNIFORM PINNACLE SET SEARCH #
+###############################
+
+def uniform_search(node_count: int):
+    return

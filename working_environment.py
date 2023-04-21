@@ -20,5 +20,7 @@ A = [[0,1,0,0,1,1,0,0,0,0],
 G = gu.create_graph_custom(A)
 #print(gu.pinnaclus_brutus(G))
 
-print(gu.pinnaclus_brutus(gu.create_graph(8,'wheel')))
-print(gu.pinnacle_computation(gu.GraphType.WHEEL,[8],8))
+gu.time_analysis(gu.create_graph(11,'bipartite6'))
+
+# print(gu.pinnaclus_brutus(gu.create_graph(8,'cycle')))
+# print(gu.pinnacle_computation(gu.GraphType.CYCLE,[8],8))
