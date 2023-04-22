@@ -448,5 +448,43 @@ def analyis_interval(G: Graph) -> None:
 # UNIFORM PINNACLE SET SEARCH #
 ###############################
 
-def uniform_search(node_count: int):
-    return
+def increment_matrix(adjacency_matrix: list, key: list = [0,0]):
+    if key[0] == key[1]:
+        if key[1]+1 < len(adjacency_matrix): increment_matrix(adjacency_matrix,[key[0],key[1]+1])
+        else:
+            if key[0]+1 < len(adjacency_matrix): increment_matrix(adjacency_matrix,[key[0]+1,key[0]+1])
+            else: return
+    else:
+        if adjacency_matrix[key[0]][key[1]] == 0: 
+            adjacency_matrix[key[0]][key[1]] = 1
+            adjacency_matrix[key[1]][key[0]] = 1
+            return
+        else:
+            adjacency_matrix[key[0]][key[1]] = 0
+            adjacency_matrix[key[1]][key[0]] = 0
+            if key[1] < len(adjacency_matrix)-1: increment_matrix(adjacency_matrix,[key[0],key[1]+1])
+            else:
+                if key[0] < len(adjacency_matrix)-1: increment_matrix(adjacency_matrix,[key[0]+1,key[0]+1])
+                else: return
+
+def uniform_search(adjacency_matrix: list):
+    uniform = []
+    increment_matrix(adjacency_matrix)
+    while adjacency_matrix != [[0]*len(adjacency_matrix)]*len(adjacency_matrix):
+        #print(adjacency_matrix)
+        if all([1 in row for row in adjacency_matrix]):
+            p = pinnaclus_brutus(create_graph_custom(adjacency_matrix))
+            vals = list(p.values())
+            if all(val[0] == vals[0][0] for val in vals):
+                print(p)
+                print(adjacency_matrix)
+                new = []
+                for r in adjacency_matrix: new.append(r.copy())
+                uniform.append(new)
+        increment_matrix(adjacency_matrix)
+    print(uniform)
+    print(f'Done')
+    
+
+adj = [[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0]]
+uniform_search(adj)
