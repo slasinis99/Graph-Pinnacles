@@ -42,6 +42,8 @@ class GraphType(Enum):
 
 @dataclass(eq=False)
 class Node():
+    
+
     value: int = field(default=0, repr=True)
     connection_list: list = field(default_factory=list, repr=False)
     
