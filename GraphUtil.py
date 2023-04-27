@@ -422,11 +422,12 @@ def pinnacle_computation(GT: GraphType, pinnacle_set: list, node_count: int, sta
         return node_count*2**(node_count-2)
     elif GT == GraphType.WHEEL:
         n = node_count
-        return factorial(n-1) + (n-1) * (2**(n-2) + sum([2**(i-2)*factorial(n-i) for i in range(2,n-1)]))
+        pinn = factorial(n-1) + (n-1) * (2**(n-2) + sum([2**(i-2)*factorial(n-i) for i in range(2,n-1)]))
     else:
         raise PinnacleFormulaNotDerived(GT)
     
     if time_log: print(f"pinnacle_computation({GT}, {pinnacle_set}) runtime = {time.time()-t}")
+
     return pinn
 
 ###############################
