@@ -483,9 +483,13 @@ def uniform_search(adjacency_matrix: list):
                 for r in adjacency_matrix: new.append(r.copy())
                 uniform.append(new)
         increment_matrix(adjacency_matrix)
-    print(uniform)
+    #print(uniform)
     print(f'Done')
     
+# adj = []
+# for i in range(6):
+#     adj.append([0]*6)
 
-# adj = [[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0]]
+# t = time.time()
 # uniform_search(adj)
+# print(f'Total Time = {time.time()-t}secs')
