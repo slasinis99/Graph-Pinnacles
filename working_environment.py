@@ -21,6 +21,8 @@ from math import trunc
 # print(f'Pinnacle Set Frequency for Petersen Graph')
 # print(gu.pinnaclus_brutus(G))
 
-#print(gu.pinnaclus_utopius(gu.create_graph(10,'wheel'),[10],True)[0])
-print(gu.pinnaclus_brutus(gu.create_graph(9,'wheel'),True)['[9]'])
-#print(gu.pinnacle_computation(gu.GraphType.BIPARTITE,[50,49,48,47,46],50,bipartite_left=30,time_log=True))
+# u = gu.pinnaclus_utopius(gu.create_graph(11,'wheel'),[11],True)
+# print(u[0])
+# print(len(u[1]))
+# print(gu.pinnaclus_brutus(gu.create_graph(11,'wheel'),True)['[11]'])
+print(gu.pinnacle_computation(gu.GraphType.STAR,[12],12,star_count=5,time_log=True))

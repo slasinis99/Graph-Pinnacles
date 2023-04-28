@@ -59,9 +59,11 @@ class Graph():
         return s
     
     def set_node_value(self, node: Node, value: int):
+        if not node in self.nodes: print('Node not in Graph')
         self.reach[0].add(node)
         self.reach[1] = self.reach[1] | node.set_value(value)
-        if node in self.reach[1]: self.reach[1].remove(node)
+        for nodes in self.reach[0]:
+            if nodes in self.reach[1]: self.reach[1].remove(nodes)
 
     def reset_node_values(self):
         for node in self.nodes:
@@ -72,7 +74,7 @@ class Graph():
         new_graph = Graph(self.matrix,self.type,self.id+'-Copy')
         for i, node in enumerate(self.nodes):
             if node.value != 0:
-                new_graph.set_node_value(self.nodes[i],node.value)
+                new_graph.set_node_value(new_graph.nodes[i],node.value)
         return new_graph
 
 ##################
@@ -239,39 +241,72 @@ def fast_fill(G: Graph, initial_labeling: list[Node], pinnacle_set: list[int], t
 
     G.reset_node_values()
 
-    pinnacle_set.sort(reverse=True)
-    NP = [i for i in range(pinnacle_set[0],0,-1) if not i in pinnacle_set]
+    NP = [i for i in range(max(pinnacle_set),-1,-1) if not i in pinnacle_set]
 
     for i, node in enumerate(initial_labeling):
+        #print(node)
         G.set_node_value(node,pinnacle_set[i])
-    
+
     graph_list = [G]
     final_list = []
     total = 0
+    #print(len(G.reach[0]), len(G.reach[1]))
     for val in NP:
+        #print(val)
         new_graph_list = []
         for graph in graph_list:
-            for i, node in enumerate(graph.nodes):
-                if node in graph.reach[1]:
-                    valid = True
-                    if any([val > adj_node.value for adj_node in node.connections if adj_node in initial_labeling]): valid = False
-                    if all([val > adj_node.value for adj_node in node.connections]): valid = False
-                    if valid:
-                        new_graph = graph.copy()
-                        new_graph.set_node_value(new_graph.nodes[i],val)
-                        if len(new_graph.reach[0]) + len(graph.reach[1]) == new_graph.size:
-                            total += factorial(len(new_graph.reach[1]))
-                            final_list.append(new_graph)
-                        else: new_graph_list.append(new_graph)
+            if val < min(pinnacle_set) and len(graph.reach[0]) + len(graph.reach[1]) == graph.size:
+                total += factorial(len(graph.reach[1]))
+                final_list.append(graph)
+            else:
+                for i, node in enumerate(graph.nodes):
+                    if node in graph.reach[1]:
+                        valid = True
+                        if any([val > adj_node.value for adj_node in node.connections if adj_node.value in pinnacle_set]): valid = False
+                        if all([val > adj_node.value for adj_node in node.connections]): valid = False
+                        if valid:
+                            new_graph = graph.copy()
+                            new_graph.set_node_value(new_graph.nodes[i],val)
+                            new_graph_list.append(new_graph)
         graph_list = new_graph_list
     
+    # total += len(graph_list)
+    # final_list += graph_list
+
     if time_log: print(f'Fast Fill runtime = {time.time()-t}secs')
 
     return total, final_list
+
+def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> int | list:
+    
+
+    if time_log: t = time.time()
+
+    not_touching = get_nontouching_nodes(G, len(pinnacle_set))
+
+    perms = []
+    _generate_permutations(perms, pinnacle_set, len(pinnacle_set))
+
+    total = 0
+    final_graph_list = []
+    #print(not_touching)
+    for pair in not_touching:
+        for p in perms:
+            tot, l = fast_fill(G,pair[0],p)
+            total += tot
+            final_graph_list = final_graph_list + l
+    
+    if time_log: print(f'Utopius runtime = {time.time()-t}secs')
+    return total, final_graph_list
 
 ###########
 # TESTING #
 ###########
 
-G = create_graph(20,'wheel')
+G = create_graph(12,'star7')
+pset = [12,11,10,9,8]
+u = pinnaclus_utopius(G,pset,True)
+print(u[0])
+print(len(u[1]))
+
 
