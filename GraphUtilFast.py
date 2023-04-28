@@ -66,6 +66,103 @@ class Graph():
             node.value = 0
         self.reach = [set(), set()]
 
+##################
+# GRAPH CREATION #     
+##################
+
+def digits_only(s: str) -> int:
+    """Takes a string and returns an integer for the digits in string."""
+    i = ''
+    for d in [char for char in s if char.isdigit()]:
+        i += d
+    return int(i)
+
+def create_graph(node_amount: int, style: str = 'star-1', id: str = '') -> Graph:
+    """Create a Graph with the desired amount of nodes for given style
+    
+    Attributes:
+        node_amount: int -- total number of nodes / vertices in the Graph
+        style: str -- string that determines that specific of the graph type
+    """
+    
+    if style[0:4] == 'star':
+        return _star(node_amount=node_amount, star_amount=digits_only(style), id=id)
+    elif style[0:9] == 'bipartite':
+        return _bipartite(node_amount=node_amount, left_amount=digits_only(style), id=id)
+    elif style[0:5] == 'wheel':
+        return _wheel(node_amount=node_amount, id=id)
+    elif style[0:5] == 'cycle':
+        return _cycle(node_amount=node_amount, id=id)
+    elif style[0:8] == 'complete':
+        return _complete(node_amount=node_amount, id=id)
+
+def create_graph_custom(adjacency_matrix: list, id: str = ''):
+    return Graph(adjacency_matrix,GraphType.CUSTOM, id)
+
+def _star(node_amount: int, star_amount: int, id: str = '') -> Graph:
+    """Create a Star Graph Instance"""
+    
+    adjacency_matrix = []
+    for i in range(node_amount):
+        if i < star_amount:
+            node = [1]*node_amount
+            node[i] = 0
+        else: node = [1]*star_amount + [0]*(node_amount-star_amount)
+        adjacency_matrix.append(node)
+    return Graph(adjacency_matrix, GraphType.STAR, id) 
+
+def _bipartite(node_amount: int, left_amount: int, id: str = ''):
+    """Create a Complete Bipartite"""
+
+    adjacency_matrix = []
+    for i in range(left_amount):
+        adjacency_matrix.append([0]*left_amount + [1]*(node_amount-left_amount))
+        
+    for i in range(node_amount-left_amount):
+        adjacency_matrix.append([1]*left_amount + [0]*(node_amount-left_amount))
+        
+    return Graph(adjacency_matrix, GraphType.BIPARTITE, id)
+
+def _wheel(node_amount: int, id: str = '') -> Graph:
+    """Returns a wheel graph with desired node amount."""
+    
+    adjacency_matrix = []
+    
+    for i in range(node_amount-1):
+        node = [0]*node_amount
+        node[(i-1)%(node_amount-1)] = 1
+        node[(i+1)%(node_amount-1)] = 1
+        node[-1] = 1
+        adjacency_matrix.append(node)
+    adjacency_matrix.append([1]*(node_amount-1) + [0])
+    
+    return Graph(adjacency_matrix, GraphType.WHEEL, id)
+
+def _cycle(node_amount: int, id: str = '') -> Graph:
+    """Return a cycle graph with desired amount of nodes."""
+    adjacency_matrix = []
+    
+    for i in range(node_amount):
+        n = [0]*node_amount
+        n[(i-1)%node_amount] = 1
+        n[(i+1)%node_amount] = 1
+        adjacency_matrix.append(n)
+    
+    return Graph(adjacency_matrix, GraphType.CYCLE, id)
+
+def _complete(node_amount: int, id: str = '') -> Graph:
+    """Returns a complete graph with desired node amount."""
+    
+    adjacency_matrix = []
+    
+    for i in range(node_amount):
+        n = [1]*node_amount
+        n[i] = 0
+        adjacency_matrix.append(n)
+    
+    return Graph(adjacency_matrix, GraphType.COMPLETE, id)
+
+
 ################
 # PERMUTATIONS #
 ################
@@ -96,7 +193,16 @@ def _generate_permutations(S: list, a: list, size: int):
 ############################
 
 def get_nontouching_nodes(G: Graph, n: int, time_log: bool = False) -> list:
+    """Returns all distinct ways to label n nodes of G such that none of the labeled nodes are adjacent.
 
+    Args:
+        G (Graph): Graph to use.
+        n (int): Number of nodes to label.
+        time_log (bool, optional): Print the runtime? Defaults to False.
+
+    Returns:
+        list: List containing all distinct labelings, each labeling has the n nodes object references to the original graph
+    """
 
     if time_log: t = time.time()
 
@@ -107,9 +213,10 @@ def get_nontouching_nodes(G: Graph, n: int, time_log: bool = False) -> list:
         pair_dict = {}
         for n1 in pairings[-1]:
             for n2 in pairings[0]:
-                if not any(val in n1[0] for val in n2[0]) and not any(val in n1[1] for val in n2[0]) and not n1[0] | n2[0] in pair_dict.values():
-                    new_pairs.append([n1[0] | n2[0], n1[1] | n2[1]])
-                    pair_dict[str(len(new_pairs))] = n1[0] | n2[0]
+                test_set = [n1[0] | n2[0], n1[1] | n2[1]]
+                if not any(val in n1[0] for val in n2[0]) and not any(val in n1[1] for val in n2[0]) and not test_set[0] in pair_dict.values():
+                    new_pairs.append(test_set)
+                    pair_dict[str(len(new_pairs))] = test_set[0]
         pairings.append(new_pairs)
     
     if time_log: print(f'get_nontouching_pairs runtime = {time.time()-t}secs')
@@ -121,17 +228,6 @@ def get_nontouching_nodes(G: Graph, n: int, time_log: bool = False) -> list:
 # TESTING #
 ###########
 
-A = [[0,1,0,0,1,1,0,0,0,0],
-     [1,0,1,0,0,0,1,0,0,0],
-     [0,1,0,1,0,0,0,1,0,0],
-     [0,0,1,0,1,0,0,0,1,0],
-     [1,0,0,1,0,0,0,0,0,1],
-     [1,0,0,0,0,0,0,1,1,0],
-     [0,1,0,0,0,0,0,0,1,1],
-     [0,0,1,0,0,1,0,0,0,1],
-     [0,0,0,1,0,1,1,0,0,0],
-     [0,0,0,0,1,0,1,1,0,0]]
+G = create_graph(20,'wheel')
 
-G = Graph(A, GraphType.CUSTOM, 'My Graph')
-
-print(len(get_nontouching_nodes(G,2,True)))
+print(len(get_nontouching_nodes(G,4,True)))
