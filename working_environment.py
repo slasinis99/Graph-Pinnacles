@@ -22,5 +22,5 @@ from math import trunc
 # print(gu.pinnaclus_brutus(G))
 
 #print(gu.pinnaclus_utopius(gu.create_graph(10,'wheel'),[10],True)[0])
-#print(gu.pinnaclus_brutus(gu.create_graph(10,'wheel'),True)['[10]'])
-print(gu.pinnacle_computation(gu.GraphType.BIPARTITE,[50,49,48,47,46],50,bipartite_left=30,time_log=True))
+print(gu.pinnaclus_brutus(gu.create_graph(9,'wheel'),True)['[9]'])
+#print(gu.pinnacle_computation(gu.GraphType.BIPARTITE,[50,49,48,47,46],50,bipartite_left=30,time_log=True))
