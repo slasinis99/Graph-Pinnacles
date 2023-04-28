@@ -68,6 +68,13 @@ class Graph():
             node.value = 0
         self.reach = [set(), set()]
 
+    def copy(self) -> Graph:
+        new_graph = Graph(self.matrix,self.type,self.id+'-Copy')
+        for i, node in enumerate(self.nodes):
+            if node.value != 0:
+                new_graph.set_node_value(self.nodes[i],node.value)
+        return new_graph
+
 ##################
 # GRAPH CREATION #     
 ##################
@@ -226,8 +233,9 @@ def get_nontouching_nodes(G: Graph, n: int, time_log: bool = False) -> list:
     return pairings[-1]
 
 
-def fill_in_graph(G: Graph, initial_labeling: list[Node], pinnacle_set: list[int]) -> list[Graph]:
+def fast_fill(G: Graph, initial_labeling: list[Node], pinnacle_set: list[int], time_log: bool = False) -> list[Graph]:
 
+    if time_log: t = time.time()
 
     G.reset_node_values()
 
@@ -238,18 +246,28 @@ def fill_in_graph(G: Graph, initial_labeling: list[Node], pinnacle_set: list[int
         G.set_node_value(node,pinnacle_set[i])
     
     graph_list = [G]
+    final_list = []
     total = 0
     for val in NP:
+        new_graph_list = []
         for graph in graph_list:
-            if len(graph.reach[0]) + len(graph.reach[1]) == graph.size:
-                total += factorial(len(graph.reach[1]))
-            else:
-                for node in graph.reach[1]:
+            for i, node in enumerate(graph.nodes):
+                if node in graph.reach[1]:
                     valid = True
                     if any([val > adj_node.value for adj_node in node.connections if adj_node in initial_labeling]): valid = False
                     if all([val > adj_node.value for adj_node in node.connections]): valid = False
-                    
-    return
+                    if valid:
+                        new_graph = graph.copy()
+                        new_graph.set_node_value(new_graph.nodes[i],val)
+                        if len(new_graph.reach[0]) + len(graph.reach[1]) == new_graph.size:
+                            total += factorial(len(new_graph.reach[1]))
+                            final_list.append(new_graph)
+                        else: new_graph_list.append(new_graph)
+        graph_list = new_graph_list
+    
+    if time_log: print(f'Fast Fill runtime = {time.time()-t}secs')
+
+    return total, final_list
 
 ###########
 # TESTING #
@@ -257,4 +275,3 @@ def fill_in_graph(G: Graph, initial_labeling: list[Node], pinnacle_set: list[int
 
 G = create_graph(20,'wheel')
 
-print(len(get_nontouching_nodes(G,9,True)))
