@@ -303,8 +303,8 @@ def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> i
 # TESTING #
 ###########
 
-G = create_graph(12,'star7')
-pset = [12,11,10,9,8]
+G = create_graph(15,'star5')
+pset = [15,14,13,12,11]
 u = pinnaclus_utopius(G,pset,True)
 print(u[0])
 print(len(u[1]))

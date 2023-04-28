@@ -25,4 +25,4 @@ from math import trunc
 # print(u[0])
 # print(len(u[1]))
 # print(gu.pinnaclus_brutus(gu.create_graph(11,'wheel'),True)['[11]'])
-print(gu.pinnacle_computation(gu.GraphType.STAR,[12],12,star_count=5,time_log=True))
+print(gu.pinnacle_computation(gu.GraphType.STAR,[15,14,13,12,11],15,star_count=5,time_log=True))
