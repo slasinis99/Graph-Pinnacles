@@ -1,6 +1,7 @@
 from __future__ import annotations
 from enum import Enum, auto
 import time
+from math import factorial
 
 #########
 # ENUMS #
@@ -42,6 +43,7 @@ class Graph():
         self.id = id
         self.type = type
         self.matrix = adjacency_matrix
+        self.size = len(adjacency_matrix)
         self.reach = [set(), set()]
         self.nodes = [Node() for _ in range(len(adjacency_matrix))]
         for r, node in enumerate(self.nodes):
@@ -224,7 +226,29 @@ def get_nontouching_nodes(G: Graph, n: int, time_log: bool = False) -> list:
     return pairings[-1]
 
 
-def fill_in_graph(G: Graph, initial_labeling: list[Node]) -> list[Graph]:
+def fill_in_graph(G: Graph, initial_labeling: list[Node], pinnacle_set: list[int]) -> list[Graph]:
+
+
+    G.reset_node_values()
+
+    pinnacle_set.sort(reverse=True)
+    NP = [i for i in range(pinnacle_set[0],0,-1) if not i in pinnacle_set]
+
+    for i, node in enumerate(initial_labeling):
+        G.set_node_value(node,pinnacle_set[i])
+    
+    graph_list = [G]
+    total = 0
+    for val in NP:
+        for graph in graph_list:
+            if len(graph.reach[0]) + len(graph.reach[1]) == graph.size:
+                total += factorial(len(graph.reach[1]))
+            else:
+                for node in graph.reach[1]:
+                    valid = True
+                    if any([val > adj_node.value for adj_node in node.connections if adj_node in initial_labeling]): valid = False
+                    if all([val > adj_node.value for adj_node in node.connections]): valid = False
+                    
     return
 
 ###########
