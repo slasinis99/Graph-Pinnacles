@@ -586,4 +586,4 @@ def uniform_search(adjacency_matrix: list):
 # print(f'Total Time = {time.time()-t}secs')
 
 G = create_graph(20,'wheel')
-print(len(get_non_touching_pairs(G,4,True)))
+print(len(get_non_touching_pairs(G,9,True)))

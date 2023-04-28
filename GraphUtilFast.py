@@ -224,10 +224,13 @@ def get_nontouching_nodes(G: Graph, n: int, time_log: bool = False) -> list:
     return pairings[-1]
 
 
+def fill_in_graph(G: Graph, initial_labeling: list[Node]) -> list[Graph]:
+    return
+
 ###########
 # TESTING #
 ###########
 
 G = create_graph(20,'wheel')
 
-print(len(get_nontouching_nodes(G,4,True)))
+print(len(get_nontouching_nodes(G,9,True)))
