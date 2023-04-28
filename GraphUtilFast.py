@@ -282,7 +282,7 @@ def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> i
 
     if time_log: t = time.time()
 
-    not_touching = get_nontouching_nodes(G, len(pinnacle_set))
+    not_touching = get_nontouching_nodes(G, len(pinnacle_set),time_log=True)
 
     perms = []
     _generate_permutations(perms, pinnacle_set, len(pinnacle_set))
@@ -290,23 +290,16 @@ def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> i
     total = 0
     final_graph_list = []
     #print(not_touching)
+    t1 = time.time()
     for pair in not_touching:
         for p in perms:
             tot, l = fast_fill(G,pair[0],p)
             total += tot
             final_graph_list = final_graph_list + l
-    
+    print(f'Fast Fill time = {time.time()-t}')
     if time_log: print(f'Utopius runtime = {time.time()-t}secs')
     return total, final_graph_list
 
-###########
-# TESTING #
-###########
 
-G = create_graph(14,'star5')
-pset = [14,13,12,11]
-u = pinnaclus_utopius(G,pset,True)
-print(u[0])
-print(len(u[1]))
 
 
