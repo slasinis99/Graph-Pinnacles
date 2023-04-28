@@ -59,7 +59,6 @@ class Graph():
         return s
     
     def set_node_value(self, node: Node, value: int):
-        if not node in self.nodes: print('Node not in Graph')
         self.reach[0].add(node)
         self.reach[1] = self.reach[1] | node.set_value(value)
         for nodes in self.reach[0]:
@@ -76,6 +75,9 @@ class Graph():
             if node.value != 0:
                 new_graph.set_node_value(new_graph.nodes[i],node.value)
         return new_graph
+
+    def get_smallest_degree(self):
+        return min([len(node.connections) for node in self.nodes])
 
 ##################
 # GRAPH CREATION #     
@@ -255,23 +257,16 @@ def fast_fill(G: Graph, initial_labeling: list[Node], pinnacle_set: list[int], t
         #print(val)
         new_graph_list = []
         for graph in graph_list:
-            if val < min(pinnacle_set) and len(graph.reach[0]) + len(graph.reach[1]) == graph.size:
+            if len(graph.reach[0]) + len(graph.reach[1]) == graph.size and val < min(pinnacle_set):
                 total += factorial(len(graph.reach[1]))
                 final_list.append(graph)
             else:
                 for i, node in enumerate(graph.nodes):
-                    if node in graph.reach[1]:
-                        valid = True
-                        if any([val > adj_node.value for adj_node in node.connections if adj_node.value in pinnacle_set]): valid = False
-                        if all([val > adj_node.value for adj_node in node.connections]): valid = False
-                        if valid:
-                            new_graph = graph.copy()
-                            new_graph.set_node_value(new_graph.nodes[i],val)
-                            new_graph_list.append(new_graph)
+                    if node.value == 0 and all([val < adj_node.value for adj_node in node.connections if adj_node.value in pinnacle_set]) and any([val < adj_node.value for adj_node in node.connections]):
+                        new_graph = graph.copy()
+                        new_graph.set_node_value(new_graph.nodes[i],val)
+                        new_graph_list.append(new_graph)
         graph_list = new_graph_list
-    
-    # total += len(graph_list)
-    # final_list += graph_list
 
     if time_log: print(f'Fast Fill runtime = {time.time()-t}secs')
 
@@ -283,20 +278,20 @@ def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> i
     if time_log: t = time.time()
 
     not_touching = get_nontouching_nodes(G, len(pinnacle_set),time_log=True)
+    print(f'Number of Distinct Non touching labelings = {len(not_touching)}')
 
     perms = []
     _generate_permutations(perms, pinnacle_set, len(pinnacle_set))
 
     total = 0
     final_graph_list = []
-    #print(not_touching)
-    t1 = time.time()
+    
     for pair in not_touching:
         for p in perms:
             tot, l = fast_fill(G,pair[0],p)
             total += tot
             final_graph_list = final_graph_list + l
-    print(f'Fast Fill time = {time.time()-t}')
+    
     if time_log: print(f'Utopius runtime = {time.time()-t}secs')
     return total, final_graph_list
 
