@@ -2,7 +2,7 @@ from __future__ import annotations
 from enum import Enum, auto
 import time
 from math import factorial
-
+import GraphUtil as gu
 #########
 # ENUMS #
 #########
@@ -44,7 +44,7 @@ class Graph():
         self.type = type
         self.matrix = adjacency_matrix
         self.size = len(adjacency_matrix)
-        self.reach = [set(), set()]
+        self.reach = set()
         self.nodes = [Node() for _ in range(len(adjacency_matrix))]
         for r, node in enumerate(self.nodes):
             for c, other_node in enumerate(self.nodes):
@@ -59,15 +59,12 @@ class Graph():
         return s
     
     def set_node_value(self, node: Node, value: int):
-        self.reach[0].add(node)
-        self.reach[1] = self.reach[1] | node.set_value(value)
-        for nodes in self.reach[0]:
-            if nodes in self.reach[1]: self.reach[1].remove(nodes)
+        self.reach = self.reach | {node} | node.set_value(value)
 
     def reset_node_values(self):
         for node in self.nodes:
             node.value = 0
-        self.reach = [set(), set()]
+        self.reach = set()
 
     def copy(self) -> Graph:
         new_graph = Graph(self.matrix,self.type,self.id+'-Copy')
@@ -236,14 +233,13 @@ def get_nontouching_nodes(G: Graph, n: int, time_log: bool = False) -> list:
 
     return pairings[-1]
 
-
 def fast_fill(G: Graph, initial_labeling: list[Node], pinnacle_set: list[int], time_log: bool = False) -> list[Graph]:
 
     if time_log: t = time.time()
 
     G.reset_node_values()
 
-    NP = [i for i in range(max(pinnacle_set),-1,-1) if not i in pinnacle_set]
+    NP = [i for i in range(G.size,0,-1) if not i in pinnacle_set]
 
     for i, node in enumerate(initial_labeling):
         #print(node)
@@ -252,33 +248,32 @@ def fast_fill(G: Graph, initial_labeling: list[Node], pinnacle_set: list[int], t
     graph_list = [G]
     final_list = []
     total = 0
-    #print(len(G.reach[0]), len(G.reach[1]))
+
     for val in NP:
         #print(val)
         new_graph_list = []
         for graph in graph_list:
-            if len(graph.reach[0]) + len(graph.reach[1]) == graph.size and val < min(pinnacle_set):
-                total += factorial(len(graph.reach[1]))
-                final_list.append(graph)
-            else:
-                for i, node in enumerate(graph.nodes):
-                    if node.value == 0 and all([val < adj_node.value for adj_node in node.connections if adj_node.value in pinnacle_set]) and any([val < adj_node.value for adj_node in node.connections]):
-                        new_graph = graph.copy()
-                        new_graph.set_node_value(new_graph.nodes[i],val)
-                        new_graph_list.append(new_graph)
+            for i, node in enumerate(graph.nodes):
+                if node.value == 0 and all([val < adj_node.value for adj_node in node.connections if adj_node.value in pinnacle_set]) and any([val < adj_node.value for adj_node in node.connections]):
+                    new_graph = graph.copy()
+                    new_graph.set_node_value(new_graph.nodes[i],val)
+                    if len(new_graph.reach) == new_graph.size and val < min(pinnacle_set):
+                        total += factorial(sum([1 for node in new_graph.nodes if node.value == 0]))
+                        final_list.append(new_graph)
+                    else: new_graph_list.append(new_graph)
         graph_list = new_graph_list
 
     if time_log: print(f'Fast Fill runtime = {time.time()-t}secs')
 
     return total, final_list
 
-def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> int | list:
+def pinnaclus_maximus(G: Graph, pinnacle_set: list, time_log: bool = False) -> int | list:
     
 
     if time_log: t = time.time()
 
-    not_touching = get_nontouching_nodes(G, len(pinnacle_set),time_log=True)
-    print(f'Number of Distinct Non touching labelings = {len(not_touching)}')
+    not_touching = get_nontouching_nodes(G, len(pinnacle_set),time_log=False)
+    #print(f'Number of Distinct Non touching labelings = {len(not_touching)}')
 
     perms = []
     _generate_permutations(perms, pinnacle_set, len(pinnacle_set))
@@ -292,9 +287,62 @@ def pinnaclus_utopius(G: Graph, pinnacle_set: list, time_log: bool = False) -> i
             total += tot
             final_graph_list = final_graph_list + l
     
-    if time_log: print(f'Utopius runtime = {time.time()-t}secs')
+    if time_log: print(f'Maximus runtime = {time.time()-t}secs')
     return total, final_graph_list
 
+def fast_fill_dual(G: Graph, initial_labeling: list[Node], pinnacle_set: list[int], time_log: bool = False) -> list[Graph]:
 
+    if time_log: t = time.time()
 
+    G.reset_node_values()
 
+    NP = [i for i in range(1,G.size+1) if not i in pinnacle_set]
+
+    for i, node in enumerate(initial_labeling):
+        #print(node)
+        G.set_node_value(node,pinnacle_set[i])
+
+    graph_list = [G]
+    final_list = []
+    total = 0
+
+    for val in NP:
+        #print(val)
+        new_graph_list = []
+        for graph in graph_list:
+            for i, node in enumerate(graph.nodes):
+                if node.value == 0 and all([val > adj_node.value for adj_node in node.connections if adj_node.value in pinnacle_set]) and any([val > adj_node.value for adj_node in node.connections]):
+                    new_graph = graph.copy()
+                    new_graph.set_node_value(new_graph.nodes[i],val)
+                    if len(new_graph.reach) == new_graph.size and val > max(pinnacle_set):
+                        total += factorial(sum([1 for node in new_graph.nodes if node.value == 0]))
+                        final_list.append(new_graph)
+                    else: new_graph_list.append(new_graph)
+        graph_list = new_graph_list
+
+    if time_log: print(f'Fast Fill runtime = {time.time()-t}secs')
+
+    return total, final_list
+
+def pinnaclus_minimus(G: Graph, pinnacle_set: list, time_log: bool = False) -> int | list:
+    
+
+    if time_log: t = time.time()
+
+    not_touching = get_nontouching_nodes(G, len(pinnacle_set),time_log=False)
+    #print(f'Number of Distinct Non touching labelings = {len(not_touching)}')
+
+    perms = []
+    _generate_permutations(perms, pinnacle_set, len(pinnacle_set))
+
+    total = 0
+    final_graph_list = []
+    
+    for pair in not_touching:
+        for p in perms:
+            tot, l = fast_fill_dual(G,pair[0],p)
+            total += tot
+            final_graph_list = final_graph_list + l
+    
+    if time_log: print(f'Minimus runtime = {time.time()-t}secs')
+    return total, final_graph_list
