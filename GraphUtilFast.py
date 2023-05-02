@@ -233,7 +233,7 @@ def get_nontouching_nodes(G: Graph, n: int, time_log: bool = False) -> list:
 
     return pairings[-1]
 
-def fast_fill(G: Graph, initial_labeling: list[Node], pinnacle_set: list[int], time_log: bool = False) -> list[Graph]:
+def fast_fill(G: Graph, initial_labeling: list[Node], pinnacle_set: list[int], time_log: bool = False) -> int | list[Graph]:
 
     if time_log: t = time.time()
 
